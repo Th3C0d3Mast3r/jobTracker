@@ -1,0 +1,147 @@
+<%- include("partials/header") %>
+<%- include("partials/navbar") %>
+
+<section class="jobs-container">
+    <div class="jobs-header">
+        <h1>Jobs Overview</h1>
+        <button class="add-job">Add Job</button>
+    </div>
+
+    <div class="jobs-grid">
+        <% for(let i=0;i<12;i++){ %>
+        <div class="job-card">
+            <div class="job-header">
+                <img src="/images/default-company.png" alt="logo" class="job-logo">
+                <div>
+                    <p><strong>Company Name</strong></p>
+                    <p><small>Role • JobID123</small></p>
+                    <p>Status: <span class="status">APPLIED</span></p>
+                    <p><small>Date: 2025-10-13</small></p>
+                </div>
+            </div>
+            <p class="job-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- the modal for the add new job -->
+     <div class="jobs-header">
+  <h1>Jobs Overview</h1>
+  <button id="addJobBtn" class="add-job-btn">Add Job</button>
+</div>
+
+<!-- Modal -->
+<div id="jobModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>ADD A NEW JOB</h2>
+    <form id="addJobForm">
+      <div class="form-row">
+        <label>JOB URL</label>
+        <input type="url" name="url" required />
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label>JOB TITLE</label>
+          <input type="text" name="title" required />
+        </div>
+        <div>
+          <label>COMPANY NAME</label>
+          <input type="text" name="company" required />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label>JOB SOURCE</label>
+          <input type="text" name="source" />
+        </div>
+        <div>
+          <label>JOB TYPE</label>
+          <div class="radio-group">
+            <label><input type="radio" name="type" value="Full-Time" checked /> Full-Time</label>
+            <label><input type="radio" name="type" value="Part-Time" /> Part-Time</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label>STATUS</label>
+          <input type="text" name="status" />
+        </div>
+        <div>
+          <label>APPLIED</label>
+          <label class="switch">
+            <input type="checkbox" name="applied" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label>ADD A NEW JOB</label>
+          <input type="text" name="jobID" />
+        </div>
+        <div>
+          <label>SALARY RANGE</label>
+          <input type="text" name="salary" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>ADD DESCRIPTION</label>
+        <textarea name="description" rows="5"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">SAVE JOB</button>
+    </form>
+  </div>
+</div>
+</section>
+
+<%- include("partials/footer") %>
+
+<script>
+  const modal=document.getElementById("jobModal");
+  const openBtn=document.getElementById("addJobBtn");
+  const closeBtn=document.getElementById("closeModal");
+  const form=document.getElementById("jobForm");
+
+  openBtn.onclick=()=>modal.style.display="flex";
+  closeBtn.onclick=()=>modal.style.display="none";
+  window.onclick=(e)=>{if(e.target==modal) modal.style.display="none";};
+
+  form.addEventListener("submit",async(e)=>{
+    e.preventDefault();
+    const jobData={
+      companyName:document.getElementById("companyName").value,
+      jobTitle:document.getElementById("jobTitle").value,
+      jobID:document.getElementById("jobID").value,
+      location:document.getElementById("location").value,
+      jobDescription:document.getElementById("jobDescription").value
+    };
+
+    try{
+      const res=await fetch("/api/jobs",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(jobData)
+      });
+
+      if(res.ok){
+        alert("Job added successfully!");
+        modal.style.display="none";
+        form.reset();
+        location.reload();
+      }else{
+        alert("Failed to add job.");
+      }
+    }catch(err){
+      console.error("Error:",err);
+      alert("Error adding job.");
+    }
+  });
+</script>
