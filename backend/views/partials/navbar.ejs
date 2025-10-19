@@ -1,9 +1,34 @@
 <nav class="navbar">
-    <h2 class="logo">DASHBOARD</h2>
+  <div class="nav-content">
+    <!-- Left: Logo -->
+    <div class="logo-area">
+      <img src="/images/logo.png" alt="logo" class="company-logo">
+      <h2 class="logo-text">JobTracker</h2>
+    </div>
+
+    <!-- Center: Navigation Links -->
     <ul class="nav-links">
-        <li><a href="/profile">PROFILE</a></li>
-        <li><a href="/dashboard">DASHBOARD</a></li>
-        <li><a href="/jobs">JOBS</a></li>
-        <li><a href="#">WEB-SCRAPE</a></li>
+      <li><a href="/profile">PROFILE</a></li>
+      <li><a href="/dashboard">DASHBOARD</a></li>
+      <li><a href="/jobs">JOBS</a></li>
+      <li><a href="/webscrape">WEB-SCRAPE</a></li>
     </ul>
+
+    <!-- Right: User or Login -->
+    <div class="user-area">
+      <% if (user) { %>
+        <div class="avatar-dropdown">
+          <img src="/images/avatar.png" alt="avatar" class="avatar">
+          <div class="dropdown">
+            <p class="u-name"><%= user.name %></p>
+            <p>Total jobs: <strong><%= user.totalJobs %></strong></p>
+            <a href="/profile">View Profile</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="login-link">Login</a>
+      <% } %>
+    </div>
+  </div>
 </nav>

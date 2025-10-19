@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+<main class="main-content auth-page">
+  <section class="auth-container">
+
+    <!-- LEFT PANEL: Switch to Sign Up -->
+    <div class="panel-switch">
+      <h1>Welcome Back!</h1>
+      <p>Enter your personal details to use all of site features</p>
+      <a href="/signup" class="switch-btn">SIGN UP</a>
+    </div>
+
+    <!-- RIGHT PANEL: Login Form -->
+    <div class="panel-form">
+      <h2>Sign In</h2>
+      
+      <% if(typeof error !== 'undefined' && error){ %>
+        <p class="form-error"><%= error %></p>
+      <% } %>
+      
+      <!-- IMPORTANT: Corrected POST action to /auth/login for your Express router -->
+      <form method="POST" action="/login">
+        <label>Email</label>
+        <input name="mailId" type="email" required />
+        <label>Password</label>
+        <input name="password" type="password" required />
+        <button type="submit" class="submit-btn">SIGN IN</button>
+      </form>
+      
+      <p class="muted">New here? <a href="/signup">Create account</a></p>
+    </div>
+
+  </section>
+</main>
+
+<!-- Note: Font Awesome is required for social icons if you use the buttons above -->
+<!-- Include this in your header.ejs if needed: <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> -->
+

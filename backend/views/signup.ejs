@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main-content auth-page">
+  <section class="auth-container">
+    
+    <!-- LEFT PANEL: Switch to Login -->
+    <div class="panel-switch">
+      <h1>Welcome!</h1>
+      <p>Join the JobTracker community today and start tracking your applications efficiently.</p>
+      <a href="/login" class="switch-btn">SIGN IN</a>
+    </div>
+
+    <!-- RIGHT PANEL: Signup Form -->
+    <div class="panel-form">
+      <h2>Create Account</h2>
+
+      <% if(typeof error !== 'undefined' && error){ %>
+        <p class="form-error"><%= error %></p>
+      <% } %>
+      
+      <!-- IMPORTANT: Corrected POST action to /auth/signup for your Express router -->
+      <form method="POST" action="/signup">
+        <label>Name</label>
+        <input name="name" required /></form></br>
+        <label>Email</label>
+        <input name="mailId" type="email" required /></br>
+        <label>Password</label>
+        <input name="password" type="password" required /></br>
+        <button type="submit" class="submit-btn">SIGN UP</button>
+      </form>
+      
+      <p class="muted">Already have an account? <a href="/login">Login</a></p>
+    </div>
+
+  </section>
+</main>
+
+<%- include('partials/footer') %>

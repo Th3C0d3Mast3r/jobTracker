@@ -1,44 +1,58 @@
-import express from 'express'
-import cors from 'cors'
-import mongoose from 'mongoose'
-import {connectDB} from './src/db/database.js'
-import colors from './ansiColoring.js'
-import dotenv from 'dotenv'
-// import authRoutes from './src/routes/authRoutes.js'
-// import jobRoutes from './src/routes/jobRoutes.js'
+// server.js
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import mongoose from "mongoose";
+import authRoutes from "./src/routes/authRoutes.js";
+import jobRoutes from "./src/routes/jobRoutes.js";
 
 dotenv.config();
-const app=express();
 
-app.set("view engine", "ejs");
-app.set("views", "./views");
-app.use(express.static("public"));
+const app = express();
 
-// middlewares
+// --- Database Connection ---
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB Connected Successfully");
+  } catch (err) {
+    console.error("❌ MongoDB Connection Failed:", err.message);
+    process.exit(1);
+  }
+};
+connectDB();
+
+// --- Middlewares ---
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
 
-connectDB();   // this is where the database is connected
+// CORS setup: allow frontend requests
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Next.js frontend
+    credentials: true, // allows cookies
+  })
+);
 
-const PORT=process.env.PORT || 6500;
+// --- Routes ---
+app.use("/api/auth", authRoutes);
+app.use("/api/jobs", jobRoutes);
 
-app.get("/",(req,res)=>{
-    console.log(colors.green("[RUNNING] Base Route Running"));
-    res.send("HELLO!");
+// --- Default Route ---
+app.get("/", (req, res) => {
+  res.send("🚀 Job Tracker Backend is Running Smoothly!");
 });
 
-app.get("/trial",(req,res)=>{
-    console.log('working trial!');
+// --- Error Handling Middleware ---
+app.use((err, req, res, next) => {
+  console.error("🔥 Server Error:", err);
+  res.status(500).json({ message: "Internal Server Error", error: err.message });
 });
 
-app.get("/dashboard", (req,res)=>{
-    res.render("dashboard", {title:"Dashboard"});
-});
-
-app.get("/jobs", (req,res)=>{
-    res.render("jobs", {title:"Jobs Overview"});
-});
-
-app.listen(PORT,()=>{
-    console.log(colors.green("[RUNNING]"), `Server running on port ${PORT}`);
-});
+// --- Start Server ---
+const PORT = process.env.PORT || 6500;
+app.listen(PORT, () => console.log(`🌍 Server live on port ${PORT}`));
