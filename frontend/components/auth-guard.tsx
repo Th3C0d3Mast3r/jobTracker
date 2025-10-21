@@ -1,42 +1,45 @@
-"use client"
-import { useEffect, useState } from "react"
-import type React from "react"
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-import { useRouter } from "next/navigation"
-
-interface AuthGuardProps {
-  children: React.ReactNode
-}
-
-export function AuthGuard({ children }: AuthGuardProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
-  const router = useRouter()
+export function AuthGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Simulate auth check - in real app, check token/session
-    const checkAuth = () => {
-      const isLoggedIn = localStorage.getItem("isAuthenticated") === "true"
-      setIsAuthenticated(isLoggedIn)
+    const verifyUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:6500/api/auth/getCurrentUser", {
+          withCredentials: true,
+        });
 
-      if (!isLoggedIn) {
-        router.push("/auth")
+        if (res.data?.success && res.data?.user) {
+          setAuthenticated(true);
+        } else {
+          router.replace("/login");
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        router.replace("/auth");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [router])
+    verifyUser();
+  }, [router]);
 
-  if (isAuthenticated === null) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="h-screen flex items-center justify-center text-lg font-semibold text-muted-foreground">
+        Checking authentication...
       </div>
-    )
+    );
   }
 
-  if (!isAuthenticated) {
-    return null
-  }
+  if (!authenticated) return null;
 
-  return <>{children}</>
+  return <>{children}</>;
 }

@@ -42,7 +42,7 @@ export default function LandingPage() {
               <Link href="/auth">Get Started</Link>
             </Button>
             <Button variant="outline" size="lg" className="text-base px-8 py-3 bg-transparent">
-              Learn More
+              <Link href="https://github.com/Th3C0d3Mast3r">About Creator</Link>
             </Button>
           </div>
         </div>
