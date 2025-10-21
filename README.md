@@ -12,7 +12,7 @@ A simple yet powerful web application to **track and manage your job application
 - **Status Tracking & Dashboard**  
   Visualize your applications with intuitive status cards: Applied, Interviewing, Offered, and Rejected. Filter by status or search by company, position, or location.
 
-- **Web Scraping Support** *(Optional/Future)*  
+- **Web Scraping Support** *(Upcoming Versions)*  
   Automatically fetch job information from online job boards and pre-fill application details to save time and ensure accuracy.
 
 - **Responsive Design**  
@@ -48,7 +48,8 @@ A simple yet powerful web application to **track and manage your job application
 1. Clone the repository:  
    ```bash
    git clone <repo-url>
-```
+   ```
+
 2. Install dependencies:
 ```bash
 npm install
