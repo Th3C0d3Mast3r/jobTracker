@@ -6,6 +6,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import authRoutes from "./src/routes/authRoutes.js";
 import jobRoutes from "./src/routes/jobRoutes.js";
+import scraperRoutes from "./src/routes/scraperRoutes.js";
 
 dotenv.config();
 
@@ -46,6 +47,8 @@ app.use("/api/jobs", jobRoutes);
 app.get("/", (req, res) => {
   res.send("🚀 Job Tracker Backend is Running Smoothly!");
 });
+
+app.use("/api", scraperRoutes);
 
 // --- Error Handling Middleware ---
 app.use((err, req, res, next) => {

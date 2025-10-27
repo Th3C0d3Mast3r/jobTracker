@@ -39,17 +39,14 @@ router.get("/getUserJobs", verifyToken, async (req, res) => {
 });
 
 // ✅ POST: Add a new job
-router.post("/addJob", verifyToken, async(req,res)=>{
+router.post("/addJob", verifyToken, async(req,res)=>{ 
   try{
-    const { companyName, jobDescription, jobTitle, jobStatus, source, location, salary } = req.body;
+    const { companyName, jobDescription, jobTitle, jobID, jobStatus, location, salary } = req.body;
     const userId = req.user?._id;
 
     if(!companyName||!jobTitle){
       return res.status(400).json({ error:"companyName and jobTitle are required" });
     }
-
-    // Generate a unique jobID if not sent
-    const jobID = Date.now().toString(); 
 
     const newJob = new Jobs({
       companyName,
@@ -57,7 +54,6 @@ router.post("/addJob", verifyToken, async(req,res)=>{
       jobTitle,
       jobID,
       jobStatus,
-      source,
       location,
       salary,
     });
@@ -71,7 +67,7 @@ router.post("/addJob", verifyToken, async(req,res)=>{
     res.status(201).json({ message:"Job added successfully", job: savedJob });
   }catch(err){
     console.error("[ERROR] Adding job failed:",err);
-    res.status(500).json({ error:"Server Error while adding job" });
+    res.status(500).json({ error:err });
   }
 });
 
@@ -84,7 +80,7 @@ router.put("/updateJob/:id", verifyToken, async (req, res) => {
 
     const updatedJob = await Jobs.findByIdAndUpdate(
       id,
-      { companyName, jobDescription, jobTitle, jobID, jobStatus, source, location, salary },
+      { companyName, jobDescription, jobTitle, jobID, jobStatus, location, salary },
       { new: true }
     );
 
