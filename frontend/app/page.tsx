@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
+import {Footer} from "@/components/footer"
 import {
   BriefcaseIcon,
   ChartBarIcon,
@@ -132,12 +133,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 JobTracker. Built for job seekers, by job seekers.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

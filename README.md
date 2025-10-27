@@ -28,8 +28,8 @@ A simple yet powerful web application to **track and manage your job application
 | Version | Date       | Description                                                                 |
 |---------|------------|-----------------------------------------------------------------------------|
 | 1.0.0   | 19-10-2025 | Basic CRUD Frontend and Backend Working - Auth not done(auth securing in progress) |
-| 1.0.1   | TBA | Auth Enabled and proper working |
-| 1.0.2   | TBA | Proper Web-Scraping Features for Good Companies |
+| 1.0.1   | 27-10-2025 | Auth Enabled and proper working |
+| 1.0.2   | 27-10-2025 | Proper Web-Scraping Features for Good Companies |
 | 1.0.3   | TBA | Connecting the Job Communities |
 
 ---

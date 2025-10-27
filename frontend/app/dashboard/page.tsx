@@ -6,12 +6,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AddJobDialog } from "@/components/add-job-dialog"
+// import { Footer } from "@/components/footer"
 import {
   PlusIcon,
   CheckCircleIcon,
   ClockIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline"
+import { Footer } from "@/components/footer"
 
 interface JobApplication {
   id: string
@@ -258,12 +260,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <Footer/>
+
         <AddJobDialog
           open={isAddJobOpen}
           onOpenChange={setIsAddJobOpen}
           onAddJob={editingJob ? handleEditJob : handleAddJob}
           editingJob={editingJob}
         />
+        
       </DashboardLayout>
     </AuthGuard>
   )

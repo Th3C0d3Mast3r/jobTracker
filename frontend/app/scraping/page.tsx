@@ -8,6 +8,7 @@ import { companies } from "./companies-data" // make sure this exports your comp
 import { MagnifyingGlassIcon, ClockIcon } from "@heroicons/react/24/outline"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { Footer } from "@/components/footer"
 
 interface ScrapeFilters {
   location?: string
@@ -193,6 +194,7 @@ export default function ScrapingPage() {
             results={scrapingResults}
           />
         </div>
+        <Footer />
       </DashboardLayout>
     </AuthGuard>
   )
