@@ -12,6 +12,14 @@ const userSchema=new mongoose.Schema({
         type:String,
         required:true,
     },
+    googleTokenEncrypted: {
+        type: Object,
+        select: false
+    },
+    mailLastSync: { type: Date },
+    googleAuthMail: {
+        type: String,
+    },
     jobsAppliedTo:[{
         type:mongoose.Schema.Types.ObjectId, 
         ref:"Jobs",

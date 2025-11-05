@@ -15,6 +15,9 @@ import {
 } from "@heroicons/react/24/outline"
 import { Footer } from "@/components/footer"
 
+import { useSearchParams } from "next/navigation"
+import { toast } from "sonner" // ✅ if you’re already using it for notifications
+
 interface JobApplication {
   id: string
   jobID: string
@@ -38,6 +41,29 @@ const statusConfig = {
 }
 
 export default function DashboardPage() {
+
+  const searchParams = useSearchParams();
+
+  const [gmailConnected, setGmailConnected] = useState(false);
+
+  useEffect(() => {
+    const gmailStatus = searchParams.get("gmail");
+    if (gmailStatus === "connected") {
+      toast.success("✅ Gmail successfully connected!");
+      setGmailConnected(true);
+      window.history.replaceState({}, document.title, "/dashboard");
+    }
+  }, [searchParams]);
+
+  const refreshMail = async () => {
+    try {
+      const res = await axios.get("http://localhost:6500/api/mail/sync-now", { withCredentials: true });
+      toast.success(res.data?.message || "Mail synced successfully!");
+    } catch (err:any) {
+      toast.error(err.response?.data?.error || "Mail sync failed!");
+    }
+  };
+
   const [jobs, setJobs] = useState<JobApplication[]>([])
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [isAddJobOpen, setIsAddJobOpen] = useState(false)
@@ -141,6 +167,19 @@ export default function DashboardPage() {
     }
   }
 
+  const connectMail = async () => {
+  try {
+    const res = await axios.get("http://localhost:6500/api/mail/auth-url", { withCredentials: true });
+    if (res.data?.url) {
+      window.location.href = res.data.url; // redirect to google consent
+    } else {
+      console.error("No auth URL returned");
+    }
+  } catch (err) {
+    console.error("Connect mail failed", err);
+  }
+};
+
   // 🌟 Cycle status
   const cycleStatus = async (job: JobApplication) => {
     const currentIndex = statusOrder.indexOf(job.status)
@@ -172,12 +211,28 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-3xl font-bold text-foreground">Job Applications</h1>
               <p className="text-muted-foreground">Track and manage your job application progress</p>
+              <p className="text-muted-foreground">(automate with mail may need you to check all the jobs manually)</p>
             </div>
-            <Button onClick={() => setIsAddJobOpen(true)} className="flex items-center gap-2">
-              <PlusIcon className="h-4 w-4" />
-              Add Application
-            </Button>
+
+            <div className="flex items-center gap-2">
+              <Button onClick={() => setIsAddJobOpen(true)} className="flex items-center gap-2">
+                <PlusIcon className="h-4 w-4" />
+                Add Application
+              </Button>
+
+              {!gmailConnected ? (
+                <Button variant="secondary" onClick={connectMail} className="flex items-center gap-2">
+                  <PlusIcon className="h-4 w-4" />
+                  Automate w/ Mail
+                </Button>
+              ) : (
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  ✅ Mail Connected
+                </span>
+              )}
+            </div>
           </div>
+
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {Object.entries(statusCounts).map(([status, count]) => {

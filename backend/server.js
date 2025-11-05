@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import authRoutes from "./src/routes/authRoutes.js";
 import jobRoutes from "./src/routes/jobRoutes.js";
 import scraperRoutes from "./src/routes/scraperRoutes.js";
+import mailRoutes from "./src/routes/mailRoutes.js";
+import { runGmailSync } from "./src/services/gmailSync.js";
 
 dotenv.config();
 
@@ -19,9 +21,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("✅ MongoDB Connected Successfully");
+    console.log("[SUCCESS] MongoDB Connected");
   } catch (err) {
-    console.error("❌ MongoDB Connection Failed:", err.message);
+    console.error("[FAILED] MongoDB Connection:", err.message);
     process.exit(1);
   }
 };
@@ -56,6 +58,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal Server Error", error: err.message });
 });
 
+app.use("/api/mail", mailRoutes);
+
+// setInterval(async () => {
+//   console.log("Running Gmail Sync...");
+//   await runGmailSync();
+// }, 5 * 60 * 1000); // 5 mins
+
 // --- Start Server ---
 const PORT = process.env.PORT || 6500;
-app.listen(PORT, () => console.log(`🌍 Server live on port ${PORT}`));
+app.listen(PORT, () => console.log(`[LIVE] Server @ ${PORT}`));
