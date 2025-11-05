@@ -6,17 +6,18 @@ import { Card, CardContent } from "@/components/ui/card"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AddJobDialog } from "@/components/add-job-dialog"
-// import { Footer } from "@/components/footer"
 import {
   PlusIcon,
   CheckCircleIcon,
   ClockIcon,
   XCircleIcon,
+  PencilIcon,
+  CheckIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline"
 import { Footer } from "@/components/footer"
-
 import { useSearchParams } from "next/navigation"
-import { toast } from "sonner" // ✅ if you’re already using it for notifications
+import { toast } from "sonner"
 
 interface JobApplication {
   id: string
@@ -41,35 +42,33 @@ const statusConfig = {
 }
 
 export default function DashboardPage() {
-
-  const searchParams = useSearchParams();
-
-  const [gmailConnected, setGmailConnected] = useState(false);
-
-  useEffect(() => {
-    const gmailStatus = searchParams.get("gmail");
-    if (gmailStatus === "connected") {
-      toast.success("✅ Gmail successfully connected!");
-      setGmailConnected(true);
-      window.history.replaceState({}, document.title, "/dashboard");
-    }
-  }, [searchParams]);
-
-  const refreshMail = async () => {
-    try {
-      const res = await axios.get("http://localhost:6500/api/mail/sync-now", { withCredentials: true });
-      toast.success(res.data?.message || "Mail synced successfully!");
-    } catch (err:any) {
-      toast.error(err.response?.data?.error || "Mail sync failed!");
-    }
-  };
-
+  const searchParams = useSearchParams()
+  const [gmailConnected, setGmailConnected] = useState(false)
   const [jobs, setJobs] = useState<JobApplication[]>([])
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [isAddJobOpen, setIsAddJobOpen] = useState(false)
   const [editingJob, setEditingJob] = useState<JobApplication | null>(null)
+  const [inlineEditId, setInlineEditId] = useState<string | null>(null)
+  const [inlineEditData, setInlineEditData] = useState<Partial<JobApplication>>({})
 
-  // Fetch user's jobs
+  useEffect(() => {
+    const gmailStatus = searchParams.get("gmail")
+    if (gmailStatus === "connected") {
+      toast.success("✅ Gmail successfully connected!")
+      setGmailConnected(true)
+      window.history.replaceState({}, document.title, "/dashboard")
+    }
+  }, [searchParams])
+
+  const refreshMail = async () => {
+    try {
+      const res = await axios.get("http://localhost:6500/api/mail/sync-now", { withCredentials: true })
+      toast.success(res.data?.message || "Mail synced successfully!")
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Mail sync failed!")
+    }
+  }
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -92,7 +91,6 @@ export default function DashboardPage() {
     rejected: jobs.filter((j) => j.status.toLowerCase() === "rejected").length,
   }
 
-  // ✅ Add new job (generate jobID)
   const handleAddJob = async (newJob: Omit<JobApplication, "id" | "appliedDate" | "lastUpdate">) => {
     try {
       const res = await axios.post(
@@ -104,7 +102,7 @@ export default function DashboardPage() {
           jobDescription: newJob.description,
           jobStatus: newJob.status.toUpperCase(),
           salary: newJob.salary,
-          jobID: newJob.jobID, // ✅ now directly from form
+          jobID: newJob.jobID,
         },
         { withCredentials: true }
       )
@@ -132,7 +130,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Edit job
   const handleEditJob = async (updatedJob: JobApplication) => {
     try {
       const res = await axios.put(
@@ -148,16 +145,28 @@ export default function DashboardPage() {
         { withCredentials: true }
       )
 
+      // ✅ Instantly update UI (uses local update first)
+      setJobs((prev) =>
+        prev.map((j) =>
+          j.id === updatedJob.id ? { ...j, ...updatedJob } : j
+        )
+      )
+
+      // 🔄 Then, if server sends fresh job, merge that too (ensures consistency)
       if (res.data?.job) {
-        setJobs(jobs.map((j) => (j.id === updatedJob.id ? { ...j, ...res.data.job } : j)))
-        setEditingJob(null)
+        setJobs((prev) =>
+          prev.map((j) =>
+            j.id === updatedJob.id ? { ...j, ...res.data.job } : j
+          )
+        )
       }
+
+      // ✅ Exit edit mode
+      setInlineEditId(null)
     } catch (err) {
       console.error("Error editing job:", err)
     }
   }
-
-  // Delete job
   const handleRemoveJob = async (jobId: string) => {
     try {
       await axios.delete(`http://localhost:6500/api/jobs/deleteJob/${jobId}`, { withCredentials: true })
@@ -168,19 +177,14 @@ export default function DashboardPage() {
   }
 
   const connectMail = async () => {
-  try {
-    const res = await axios.get("http://localhost:6500/api/mail/auth-url", { withCredentials: true });
-    if (res.data?.url) {
-      window.location.href = res.data.url; // redirect to google consent
-    } else {
-      console.error("No auth URL returned");
+    try {
+      const res = await axios.get("http://localhost:6500/api/mail/auth-url", { withCredentials: true })
+      if (res.data?.url) window.location.href = res.data.url
+    } catch (err) {
+      console.error("Connect mail failed", err)
     }
-  } catch (err) {
-    console.error("Connect mail failed", err);
   }
-};
 
-  // 🌟 Cycle status
   const cycleStatus = async (job: JobApplication) => {
     const currentIndex = statusOrder.indexOf(job.status)
     const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length]
@@ -197,7 +201,6 @@ export default function DashboardPage() {
     }
   }
 
-  // 🌟 Apply status filter before rendering jobs
   const filteredJobs =
     statusFilter === "all"
       ? jobs
@@ -207,23 +210,19 @@ export default function DashboardPage() {
     <AuthGuard>
       <DashboardLayout>
         <div className="space-y-6">
+          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">Job Applications</h1>
               <p className="text-muted-foreground">Track and manage your job application progress</p>
-              <p className="text-muted-foreground">(automate with mail may need you to check all the jobs manually)</p>
             </div>
-
             <div className="flex items-center gap-2">
               <Button onClick={() => setIsAddJobOpen(true)} className="flex items-center gap-2">
-                <PlusIcon className="h-4 w-4" />
-                Add Application
+                <PlusIcon className="h-4 w-4" /> Add Application
               </Button>
-
               {!gmailConnected ? (
                 <Button variant="secondary" onClick={connectMail} className="flex items-center gap-2">
-                  <PlusIcon className="h-4 w-4" />
-                  Automate w/ Mail
+                  <PlusIcon className="h-4 w-4" /> Automate w/ Mail
                 </Button>
               ) : (
                 <span className="text-sm text-muted-foreground flex items-center gap-1">
@@ -233,7 +232,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-
+          {/* Status Filters */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {Object.entries(statusCounts).map(([status, count]) => {
               const config = statusConfig[status as keyof typeof statusConfig]
@@ -244,9 +243,7 @@ export default function DashboardPage() {
                   className={`cursor-pointer transition-colors ${
                     statusFilter === status ? "ring-2 ring-primary" : "hover:bg-accent"
                   }`}
-                  onClick={() =>
-                    setStatusFilter(statusFilter === status ? "all" : status)
-                  }
+                  onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
                 >
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-foreground">{count}</div>
@@ -259,6 +256,7 @@ export default function DashboardPage() {
             })}
           </div>
 
+          {/* Jobs List */}
           <div className="space-y-4">
             {filteredJobs.length === 0 ? (
               <Card>
@@ -270,24 +268,53 @@ export default function DashboardPage() {
               filteredJobs.map((job) => {
                 const config = statusConfig[job.status.toLowerCase() as keyof typeof statusConfig]
                 const StatusIcon = config.icon
+                const isEditing = inlineEditId === job.id
+
                 return (
                   <Card key={job.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1 space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="text-lg font-semibold text-foreground">{job.position}</h3>
-                              <p className="text-base text-muted-foreground font-medium">{job.company}</p>
+                          {/* Editable Fields */}
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <input
+                                className="border rounded p-1 w-full"
+                                value={inlineEditData.position || job.position}
+                                onChange={(e) =>
+                                  setInlineEditData({ ...inlineEditData, position: e.target.value })
+                                }
+                              />
+                              <input
+                                className="border rounded p-1 w-full"
+                                value={inlineEditData.company || job.company}
+                                onChange={(e) =>
+                                  setInlineEditData({ ...inlineEditData, company: e.target.value })
+                                }
+                              />
+                              <textarea
+                                className="border rounded p-1 w-full"
+                                value={inlineEditData.description || job.description || ""}
+                                onChange={(e) =>
+                                  setInlineEditData({ ...inlineEditData, description: e.target.value })
+                                }
+                              />
                             </div>
-                            <button
-                              onClick={() => cycleStatus(job)}
-                              className={`${config.color} text-white flex items-center gap-1 px-2 py-1 rounded-md transition hover:opacity-90`}
-                            >
-                              <StatusIcon className="h-3 w-3" />
-                              {config.label}
-                            </button>
-                          </div>
+                          ) : (
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h3 className="text-lg font-semibold text-foreground">{job.position}</h3>
+                                <p className="text-base text-muted-foreground font-medium">{job.company}</p>
+                              </div>
+                              <button
+                                onClick={() => cycleStatus(job)}
+                                className={`${config.color} text-white flex items-center gap-1 px-2 py-1 rounded-md transition hover:opacity-90`}
+                              >
+                                <StatusIcon className="h-3 w-3" />
+                                {config.label}
+                              </button>
+                            </div>
+                          )}
 
                           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <span>{job.location}</span>
@@ -296,15 +323,54 @@ export default function DashboardPage() {
                             <span>Updated: {new Date(job.lastUpdate).toLocaleDateString()}</span>
                           </div>
 
-                          {job.description && (
+                          {job.description && !isEditing && (
                             <p className="text-sm text-muted-foreground mt-2">{job.description}</p>
                           )}
                         </div>
 
                         <div className="flex gap-2">
-                          <Button variant="destructive" size="sm" onClick={() => handleRemoveJob(job.id)}>
-                            REMOVE
-                          </Button>
+                          {isEditing ? (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  handleEditJob({ ...job, ...inlineEditData })
+                                }}
+                              >
+                                <CheckIcon className="h-4 w-4" /> Save
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  setInlineEditId(null)
+                                  setInlineEditData({})
+                                }}
+                              >
+                                <XMarkIcon className="h-4 w-4" /> Cancel
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  setInlineEditId(job.id)
+                                  setInlineEditData(job)
+                                }}
+                              >
+                                <PencilIcon className="h-4 w-4" /> Edit
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleRemoveJob(job.id)}
+                              >
+                                REMOVE
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -315,7 +381,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <Footer/>
+        <Footer />
 
         <AddJobDialog
           open={isAddJobOpen}
@@ -323,7 +389,6 @@ export default function DashboardPage() {
           onAddJob={editingJob ? handleEditJob : handleAddJob}
           editingJob={editingJob}
         />
-        
       </DashboardLayout>
     </AuthGuard>
   )
