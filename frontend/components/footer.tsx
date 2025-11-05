@@ -25,10 +25,11 @@ export function Footer() {
         <div className="flex space-x-4">
           
           <a
+            href="https://github.com/Th3C0d3Mast3r/jobTracker?tab=readme-ov-file#version-history"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary transition-colors">
-            v1.0.2
+            v1.0.3
           </a>
           
           <a
