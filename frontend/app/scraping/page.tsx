@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ScrapingResultsDialog } from "@/components/scraping-results-dialog"
-import { companies } from "./companies-data" // make sure this exports your companies array
+import { companies } from "./companies-data"
 import { MagnifyingGlassIcon, ClockIcon } from "@heroicons/react/24/outline"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardLayout } from "@/components/dashboard-layout"
@@ -70,6 +70,18 @@ export default function ScrapingPage() {
         body = {
           teams: filters.teams || "",
           query: filters.query || "",
+        }
+      } else if (company.id === "cloudflare") {
+        endpoint = "http://localhost:6500/api/cloudflare-jobs"
+        body = {
+          location: filters.location || "",
+          department: filters.teams || "",
+          title: filters.query || "",
+        }
+      } else if (company.id === "deepmind") {
+        endpoint = "http://localhost:6500/api/deepmind-jobs"
+        body = {
+          keyword: filters.query || "",
         }
       }
 
@@ -172,6 +184,18 @@ export default function ScrapingPage() {
                     <div className="space-y-2 mt-2">
                       <Input placeholder="Team" onChange={e => handleFilterChange("teams", e.target.value)} />
                       <Input placeholder="Query Keywords" onChange={e => handleFilterChange("query", e.target.value)} />
+                    </div>
+                  )}
+                  {expanded && company.id === "cloudflare" && (
+                    <div className="space-y-2 mt-2">
+                      <Input placeholder="Location" onChange={e => handleFilterChange("location", e.target.value)} />
+                      <Input placeholder="Department" onChange={e => handleFilterChange("teams", e.target.value)} />
+                      <Input placeholder="Job Title / Keywords" onChange={e => handleFilterChange("query", e.target.value)} />
+                    </div>
+                  )}
+                  {expanded && company.id === "deepmind" && (
+                    <div className="space-y-2 mt-2">
+                      <Input placeholder="Keyword" onChange={e => handleFilterChange("query", e.target.value)} />
                     </div>
                   )}
 

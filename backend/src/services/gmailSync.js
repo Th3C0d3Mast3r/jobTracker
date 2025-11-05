@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import { User } from "../models/user.model.js";
 import { decryptObject } from "../utils/crypto.js";
 import { Jobs } from "../models/jobs.model.js";
+import colors from "../../ansiColoring.js";
 
 const oauth2ClientFactory = () =>
   new google.auth.OAuth2(
@@ -109,7 +110,7 @@ function extractJobDetails(subject, body) {
 
 // MAIN SYNC LOGIC
 export const runGmailSync = async () => {
-  console.log("⚙️ Running Gmail Sync...");
+  console.log(colors.highlighted_green("Running Gmail Sync..."));
   const users = await User.find(
     { googleTokenEncrypted: { $exists: true } },
     { googleTokenEncrypted: 1, mailId: 1, googleAuthMail: 1, jobsAppliedTo: 1 }
@@ -124,9 +125,9 @@ export const runGmailSync = async () => {
       oauth2Client.setCredentials(tokenObj);
       const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-      console.log(`📨 Syncing Gmail for: ${user.googleAuthMail}`);
+      console.log(colors.highlighted_green(`Syncing Gmail for: ${user.googleAuthMail}`));
 
-      const sinceDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30); // last 30 days
+      const sinceDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 15); // last 15 days
       const q = `newer_than:30d in:anywhere (
         "job application" OR "your application" OR "applied for" OR
         "thank you for applying" OR "we have received your application" OR
@@ -157,7 +158,7 @@ export const runGmailSync = async () => {
         if (matched) {
           // Update existing job
           await Jobs.findByIdAndUpdate(matched._id, { jobStatus: status }, { new: true });
-          console.log(`Updated job: ${matched.company} → ${status}`);
+          console.log(colors.highlighted_green(`Updated job: ${matched.company} → ${status}`));
         } else {
           // Create new job
           const { company, position } = extractJobDetails(subject, body);
@@ -179,18 +180,18 @@ export const runGmailSync = async () => {
 
           const newJob = await Jobs.create(jobData);
           await User.findByIdAndUpdate(user._id, { $push: { jobsAppliedTo: newJob._id } });
-          console.log(`🟢 New job added: ${company} - ${position} (${status})`);
+          console.log(`New job added: ${company} - ${position} (${status})`);
         }
       }
 
       // Update last sync time
       await User.findByIdAndUpdate(user._id, { mailLastSync: new Date() });
-      console.log(`✅ Gmail sync completed for ${user.email}`);
+      console.log(`[COMPLETED] Gmail sync for ${user.email}`);
     } catch (err) {
       console.error(`[GMAIL SYNC] user ${user.email} error:`, err?.message || err);
     }
   }
 
-  console.log("🎯 Gmail sync process finished for all users.");
+  console.log(colors.highlighted_green("[FINISHED] Gmail sync"));
 };
 export { oauth2ClientFactory };

@@ -78,4 +78,32 @@ router.post("/stripe-jobs", async (req, res) => {
   }
 });
 
+// Cloudflare jobs
+router.post("/cloudflare-jobs", async (req, res) => {
+  try {
+    const data = await runPythonScraper(
+      "scraper/webscraperCloudflare.py",
+      req.body
+    );
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to scrape Cloudflare jobs", details: err.toString() });
+  }
+});
+
+// DeepMind jobs
+router.post("/deepmind-jobs", async (req, res) => {
+  try {
+    const data = await runPythonScraper(
+      "scraper/webscraperDeepMind.py",
+      req.body
+    );
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to scrape DeepMind jobs", details: err.toString() });
+  }
+});
+
 export default router;

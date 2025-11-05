@@ -75,7 +75,7 @@ export const handleOAuthCallback=async(req,res)=>{
 export const manualSync = async (req, res) => {
   try {
     await runGmailSync();
-    return res.json({ message: "✅ Gmail sync completed successfully" });
+    return res.json({ message: "Gmail sync completed successfully" });
   } catch (error) {
     console.error("❌ Manual sync error:", error);
     return res.status(500).json({ error: error.message });
