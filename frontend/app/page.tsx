@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {Footer} from "@/components/footer"
+import {TextEffect} from "@/components/motion-primitives/text-effect"
 import {
   BriefcaseIcon,
   ChartBarIcon,
@@ -17,7 +18,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/40">
+      <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/10 border-b border-border/40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BriefcaseIcon className="h-8 w-8 text-primary" />
@@ -31,12 +32,13 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-            Track Your Job Applications
-            <span className="text-muted-foreground"> Effortlessly</span>
+            <TextEffect preset='fade-in-blur' speedReveal={1.5} speedSegment={0.3}>
+              Track Your Job Applications Effortlessly
+            </TextEffect>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-            A minimalistic, interface to organize and monitor your job search progress. Keep track of
-            applications, statuses, and discover new opportunities.
+              A minimalistic, interface to organize and monitor your job search progress. Keep track of
+              applications, statuses, and discover new opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-base px-8 py-3">
@@ -52,7 +54,9 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Everything You Need</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            <TextEffect>Everything You Need</TextEffect>
+          </h2>
           <p className="text-muted-foreground text-lg">Simple tools to streamline your job search</p>
         </div>
 

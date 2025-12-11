@@ -8,7 +8,8 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "JobTracker - Track Your Job Applications",
   description: "A minimalistic job application tracking system to organize and monitor your job search progress.",
-  generator: "v0.app",
+  generator: "Devesh",
+  icons: "/favicon.svg",
 }
 
 export default function RootLayout({
