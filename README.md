@@ -31,8 +31,7 @@ A simple yet powerful web application to **track and manage your job application
 | 1.0.1   | 27-10-2025 | Auth Enabled and proper working |
 | 1.0.2   | 27-10-2025 | Proper Web-Scraping Features for Good Companies |
 | 1.0.3   | 05-11-2025 | Gmail Sync Direct Job Fetch *(all the jobs on Gmail, are fetched here)* by OAuth of Google *(works for test users for now-during deployment, will shift to proper OAuth)* |
-| 1.0.4   | TBA        | Minimal Changes to make more SECURE and almost DEPLOYMENT READY |
-| 1.1.0   | TBA        | DEPLOYED VERSION |
+| 1.0.4   | TBA        | Minimal Changes to make more SECURE and almost DEPLOYMENT READY (might add OTP based for Local running) |
 | 2.0.0   | TBA        | Web Version of Direct USE |
 
 ---
