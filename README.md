@@ -33,6 +33,7 @@ A simple yet powerful web application to **track and manage your job application
 | 1.0.3   | 05-11-2025 | Gmail Sync Direct Job Fetch *(all the jobs on Gmail, are fetched here)* by OAuth of Google *(works for test users for now-during deployment, will shift to proper OAuth)* |
 | 1.0.4   | TBA        | Minimal Changes to make more SECURE and almost DEPLOYMENT READY |
 | 1.1.0   | TBA        | DEPLOYED VERSION |
+| 2.0.0   | TBA        | Web Version of Direct USE |
 
 ---
 
@@ -52,6 +53,23 @@ A simple yet powerful web application to **track and manage your job application
    git clone <repo-url>
    ```
 
+```
+# have this as the .env for the backend directory
+PORT=6500
+MONGO_URI=mongodb://localhost:27017/jobDatabase
+JWT_SECRET="0fcae05d1da7a6584cd3cf2dc64e604281a35c2d773962c18680243f06fcfb0f"
+# the above JWT secret was generated using the command on powershell:- $node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+
+
+GOOGLE_CLIENT_ID=<put your google studio's client ID here>
+GOOGLE_CLIENT_SECRET=<ur client secret>
+GOOGLE_REDIRECT_URI=http://localhost:6500/api/mail/callback
+ENCRYPTION_KEY=sqt02NT5Unj0KKFqB54hpt+76PsTmBiQjoYxcfCNV9I=
+
+# note, the encryption key was made using the command on powershell:- $openssl rand -base64 32
+```
+
 2. Install dependencies:
 ```bash
 npm install
@@ -61,7 +79,7 @@ npm install
 
 4. Run the backend:
 ```bash
-npm run dev
+npx nodemon server.js
 ```
 
 5. Start the frontend (Next.js):
@@ -70,3 +88,6 @@ npm run dev
 ```
 
 6. Open `http://localhost:3000` in your browser.
+
+## CONTRIBUTING
+Well, if you feel like contributing to this repo- its open-sourced. Make the changes, and upload them here- I will review and mention the contributors!
